@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "vite"
+    "start": "vite",
+    "lint": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "author": "",
   "license": "ISC",
@@ -20,11 +22,21 @@
   },
   "devDependencies": {
     "@chakra-ui/react": "^2.8.2",
+    "@eslint/js": "^9.20.0",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
     "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^15.14.0",
+    "prettier": "^3.5.0",
     "react-router-dom": "^6.22.0",
     "typescript": "^5.3.3",
+    "typescript-eslint": "^8.24.0",
     "vite": "^5.1.1"
   }
 }

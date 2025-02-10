@@ -1,69 +1,62 @@
-import React, { ReactNode } from 'react'
-import { Link } from '@chakra-ui/react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { Container, VStack, HStack, H1 } from '@northlight/ui'
+import { ExcelDropzone, ExcelRow } from './components/excel-dropzone.jsx'
+import { UserScores } from './types'
 import {
-  Container,
-  Box,
-  P,
-  VStack,
-  HStack,
-  H1,
-  H2,
-} from '@northlight/ui'
-import { palette } from '@northlight/tokens'
-import { ExcelDropzone, ExcelRow } from './excel-dropzone.jsx'
+  addUserScore,
+  addUserScores,
+  processInitialUserScores,
+  getRankings,
+} from './services/userScoreService'
+import RankingList from './components/RankingList.jsx'
+import UserScoresList from './components/UserScoresList.jsx'
+import ScoreForm from './components/ScoreForm.js'
 
-interface ExternalLinkProps {
-  href: string,
-  children: ReactNode,
-}
+const App: React.FC = () => {
+  const [userScores, setUserScores] = useState<Record<string, UserScores>>({})
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
 
-const ExternalLink = ({ href, children }: ExternalLinkProps) => <Link href={href} isExternal sx={ {color: palette.blue['500'], textDecoration: 'underline'} }>{ children }</Link>
+  useEffect(() => {
+    setUserScores(processInitialUserScores())
+  }, [])
 
-export default function App () {
-  function handleSheetData (data: ExcelRow[]) {
-    // replace this log with actual handling of the data
-    console.log(data)
+  const addScore = useCallback(
+    ({ name, score }: { name: string; score: number }) => {
+      setUserScores((prevScores) => addUserScore(prevScores, name, score))
+    },
+    [],
+  )
+
+  function handleSheetData(data: ExcelRow[]) {
+    setUserScores((prevScores) => addUserScores(prevScores, data))
   }
 
   return (
     <Container maxW="6xl" padding="4">
-      <H1 marginBottom="4" >Mediatool exercise</H1>
+      <H1 marginBottom="4">Mediatool exercise</H1>
       <HStack spacing={10} align="flex-start">
-        <ExcelDropzone
-          onSheetDrop={ handleSheetData }
-          label="Import excel file here"
-        />
         <VStack align="left">
-          <Box>
-            <H2>Initial site</H2>
-            <P>
-              Drop the excel file scores.xlsx that you will find
-              in this repo in the area to the left and watch the log output in the console.
-              We hope this is enough to get you started with the import.
-            </P>
-          </Box>
-          <Box>
-            <H2>Styling and Northlight</H2>
-            <P>
-              Styling is optional for this task and not a requirement. The styling for this app is using
-              our own library Northligth which in turn is based on Chakra UI. 
-              You <i>may</i> use it to give some style to the application but again, it is entierly optional.
-            </P>
-            <P>
-              Checkout <ExternalLink href="https://chakra-ui.com/">Chackra UI</ExternalLink> for
-              layout components such 
-              as <ExternalLink href="https://chakra-ui.com/docs/components/box">Box</ExternalLink>
-              , <ExternalLink href="https://chakra-ui.com/docs/components/stack">Stack</ExternalLink>
-              , <ExternalLink href="https://chakra-ui.com/docs/components/grid">Grid</ExternalLink>
-              , <ExternalLink href="https://chakra-ui.com/docs/components/flex">Flex</ExternalLink> and others.
-            </P>
-            <P>
-              Checkout <ExternalLink href="https://northlight.dev/">Northlight</ExternalLink> for
-              some of our components.
-            </P>
-          </Box>
+          <ScoreForm addScore={addScore} />
+          <ExcelDropzone
+            onSheetDrop={handleSheetData}
+            label="Import excel file here"
+          />
+        </VStack>
+        <VStack align="left">
+          <RankingList
+            rankings={getRankings(userScores)}
+            onUserClick={setSelectedUser}
+          />
+          {selectedUser && userScores[selectedUser] && (
+            <UserScoresList
+              name={selectedUser}
+              scores={userScores[selectedUser].scores ?? []}
+            />
+          )}
         </VStack>
       </HStack>
     </Container>
-  ) 
+  )
 }
+
+export default App

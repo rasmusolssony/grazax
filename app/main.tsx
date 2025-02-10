@@ -5,4 +5,8 @@ import App from '../src/app'
 
 const container = document.getElementById('root')
 const root = createRoot(container)
-root.render(<MediatoolThemeProvider><App /></MediatoolThemeProvider>)
+root.render(
+  <MediatoolThemeProvider>
+    <App />
+  </MediatoolThemeProvider>,
+)
